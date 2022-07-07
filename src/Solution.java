@@ -19,17 +19,17 @@ public class Solution {
      */
 //Stepik code: start
     public static class UntrustworthyMailWorker implements MailService {
-        private static MailService[] mailWorkers;
+        private MailService[] mailWorkers;
         private static RealMailService realMailService = new RealMailService();
         public RealMailService getRealMailService() {
-            return realMailService;
+            return this.realMailService;
         }
-        public UntrustworthyMailWorker (MailService[] mailWorkers){
+        public UntrustworthyMailWorker (MailService[] mailWorkers) {
             this.mailWorkers = mailWorkers;
         }
         @Override
         public Sendable processMail(Sendable mail) {
-            for (int i = 0; i < mailWorkers.length; i++){
+            for (int i = 0; i < mailWorkers.length; i++) {
                 mail = mailWorkers[i].processMail(mail);
             }
             return realMailService.processMail(mail);
@@ -37,9 +37,9 @@ public class Solution {
     }
 
     public static class Spy implements MailService {
-        private final Logger LOGGER;
+        private final Logger logger;
         public Spy(final Logger logger) {
-            this.LOGGER = logger;
+            this.logger = logger;
         }
         @Override
         public Sendable processMail(Sendable mail) {
@@ -48,9 +48,12 @@ public class Solution {
                 String to = mail.getTo();
                 if (from.equals(AUSTIN_POWERS)  || to.equals(AUSTIN_POWERS)) {
                     String message = ((MailMessage) mail).getMessage();
-                    LOGGER.warning("Detected target mail correspondence: from " + from + " to " + to + " \"" + message + "\"");
+                    //logger.warning("Detected target mail correspondence: from " + from +" to " + to + " \"" + message + "\"");
+                                                 // Detected target mail correspondence: from {from} to {to} "{message}"
+                    logger.log (Level.WARNING,"Detected target mail correspondence: from {0} to {1} \"{2}\"",
+                            new Object[] {from, to, message});
                 } else {
-                    LOGGER.info("Usual correspondence: from " + from + " to " + to + "");
+                    logger.log(Level.INFO, "Usual correspondence: from {0} to {1}",  new Object[] {from, to});
                 }
             }
             return mail;
@@ -58,13 +61,12 @@ public class Solution {
     }
 
     public static class Thief implements MailService {
-        private static int minPrice;
+        private int minPrice;
         private int stolenValue  = 0;
         public int getStolenValue() {
             return stolenValue;
         }
         public Thief(int minPrice) {
-
             this.minPrice = minPrice;
         }
         @Override
@@ -94,7 +96,7 @@ public class Solution {
             if (mail instanceof MailPackage) {
                 Package pack = ((MailPackage) mail).getContent();
                 String content = pack.getContent();
-                if (content.indexOf("stones instead of ") == 0) {
+                if (content.contains("stones")) {
                     throw new StolenPackageException();
                 }
                 if (content.contains(BANNED_SUBSTANCE) || content.contains(WEAPONS))  {
