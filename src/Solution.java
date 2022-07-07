@@ -48,8 +48,6 @@ public class Solution {
                 String to = mail.getTo();
                 if (from.equals(AUSTIN_POWERS)  || to.equals(AUSTIN_POWERS)) {
                     String message = ((MailMessage) mail).getMessage();
-                    //logger.warning("Detected target mail correspondence: from " + from +" to " + to + " \"" + message + "\"");
-                                                 // Detected target mail correspondence: from {from} to {to} "{message}"
                     logger.log (Level.WARNING,"Detected target mail correspondence: from {0} to {1} \"{2}\"",
                             new Object[] {from, to, message});
                 } else {
